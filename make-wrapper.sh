@@ -22,7 +22,7 @@ while read compiler assign value; do \
         fi \
     fi \
     done <<EOF
-$(make -spqr "$@" 2>/dev/null)
+$(make -spqRr "$@" 2>/dev/null)
 EOF
 
 # Generate file from which compiler-wrapper.sh can read config
@@ -36,7 +36,7 @@ cat $config
 echo ====================
 
 echo "[" > $db_file
-make -j -Bsk "$@" CC="$(one_word $cc_wrapper)" CXX="$(one_word $cxx_wrapper)"
+make -j1 -Bsk "$@" CC="$(one_word $cc_wrapper)" CXX="$(one_word $cxx_wrapper)"
 echo "]" >> $db_file
 
 rm -f $config &>/dev/null

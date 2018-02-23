@@ -29,22 +29,22 @@ generate_compile_command()
         # COMPILER="${COMPILER[@]:1:1}"
 
         # Treat whitespace between option and argument
-        for w in $ARGUMENTS
+        for w in $COMPILER $ARGUMENTS
         do
             if [[ $w =~ ^-.* ]]
             then
-                args="$args $w"
+                ARGS="$ARGS\",\n   \"$w"
             else
-                args="$args$w"
+                ARGS="$ARGS $w"
             fi
         done
 
-        args=$(printf '   "%s",\n' $args)
+        ARGS=\"${ARGS## }\"
 
         item=" {\n"
         item=$item"  $dir_key: $(quote $DIR),\n"
         item=$item"  $cmd_key: $(quote $CMD),\n"
-        item=$item"  $args_key: [\n   $(quote $COMPILER),\n$args\n   $(quote $FILE_NAME),\n  ],\n"
+        item=$item"  $args_key: [\n   $ARGS,\n   $(quote $FILE_NAME),\n  ],\n"
         item=$item"  $file_key: $(quote $FILE_NAME),\n },\n"
     fi
 }
