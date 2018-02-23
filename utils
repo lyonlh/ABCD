@@ -1,0 +1,9 @@
+one_word()
+{
+    echo "$*"
+}
+
+quote()
+{
+    printf "\"%s\"" "$*"
+}
