@@ -1,11 +1,13 @@
 #!/bin/bash
 
-path_name=$_
+path_name=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+# path_name=$_
 
-source "$(dirname $path_name)/utils"
+source "$path_name/utils"
 
-compiler_wrapper="$(dirname $path_name)/compiler-wrapper.sh"
-config="$(dirname $path_name)/config"
+cc_wrapper="$path_name/cc-wrapper.sh"
+cxx_wrapper="$path_name/cxx-wrapper.sh"
+config="$path_name/config"
 
 # Retrive CC/CXX from make database
 ORIGIN_CC="cc"
@@ -23,15 +25,18 @@ while read compiler assign value; do \
 $(make -spqr "$@" 2>/dev/null)
 EOF
 
-COMPILER_CC="$compiler_wrapper $ORIGIN_CC"
-COMPILER_CXX="$compiler_wrapper $ORIGIN_CXX"
-
 # Generate file from which compiler-wrapper.sh can read config
-printf "db_file=$(pwd)/compile_commands.json\n" >$config
+echo "db_file=$(pwd)/compile_commands.json" >$config
+echo "CC=$(quote $ORIGIN_CC)" >>$config
+echo "CXX=$(quote $ORIGIN_CXX)" >>$config
 source $config
 
+echo ====================
+cat $config
+echo ====================
+
 echo "[" > $db_file
-make -j -Bsk "$@" CC="$(one_word $COMPILER_CC)" CXX="$(one_word $COMPILER_CXX)"
+make -j -Bsk "$@" CC="$(one_word $cc_wrapper)" CXX="$(one_word $cxx_wrapper)"
 echo "]" >> $db_file
 
 rm -f $config &>/dev/null

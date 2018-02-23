@@ -15,11 +15,15 @@ generate_compile_command()
     local args_key='"arguments"'
     local file_key='"file"'
 
-    if [[ $CMD =~ ^([^[:blank:]]+)[[:blank:]]+(.*)[[:blank:]]+([^[:blank:]]+\.(c|cc|cpp|cxx|h|hxx))$ ]]
+    if [[ $CMD =~ ^([^[:blank:]]+)[[:blank:]]+(.*)[[:blank:]]+([^[:blank:]]+\.(c|cc|cpp|cxx|h|hxx))([[:blank:]].*)?$ ]]
     then
         COMPILER="${BASH_REMATCH[1]}"
         ARGUMENTS="${BASH_REMATCH[2]}"
         FILE_NAME="${BASH_REMATCH[3]}"
+        if [[ ${#BASH_REMATCH[@]} == 4 ]]
+        then
+            ARGUMENTS=$ARGUMENTS" ${BASH_REMATCH[4]}"
+        fi
 
         # ARGUMENTS="${COMPILER[@]:2}${ARGUMENTS}"
         # COMPILER="${COMPILER[@]:1:1}"
@@ -45,7 +49,7 @@ generate_compile_command()
     fi
 }
 
-generate_compile_command "$@"
+generate_compile_command $@
 echo -n -e "$item" >> $db_file
 
-"$@"
+$@
