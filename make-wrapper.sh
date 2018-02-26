@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 path_name=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 cc_wrapper="$path_name/cc-wrapper.sh"

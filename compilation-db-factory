@@ -40,4 +40,6 @@ generate_compile_command()
         item=$item"  $args_key: [\n   $ARGS,\n   $(quote $FILE_NAME),\n  ],\n"
         item=$item"  $file_key: $(quote $FILE_NAME),\n },\n"
     fi
+
+    [[ -n "$item" ]] && printf %b "$item"
 }
