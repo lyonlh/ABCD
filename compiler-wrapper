@@ -1,10 +1,6 @@
-#!/bin/bash
-
 path_name=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 utils="$path_name/utils"
-config="$path_name/config"
 source $utils
-source $config
 
 generate_compile_command()
 {
@@ -48,8 +44,3 @@ generate_compile_command()
         item=$item"  $file_key: $(quote $FILE_NAME),\n },\n"
     fi
 }
-
-generate_compile_command $@
-echo -n -e "$item" >> $db_file
-
-$@
