@@ -1,9 +1,14 @@
+printf_as_one()
+{
+    printf "%s" "$*"
+}
+
 escape()
 {
-    echo -n ${*//'"'/'\"'}
+     printf_as_one ${*//'"'/'\"'}
 }
 
 quote()
 {
-    echo -n \"$(escape $*)\"
+     printf_as_one '"'$(escape $*)'"'
 }
