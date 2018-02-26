@@ -1,4 +1,9 @@
+escape()
+{
+    echo -n ${*//'"'/'\"'}
+}
+
 quote()
 {
-    printf "\"%s\"" "$*"
+    echo -n \"$(escape $*)\"
 }

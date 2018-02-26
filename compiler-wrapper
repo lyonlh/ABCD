@@ -21,17 +21,14 @@ generate_compile_command()
             ARGUMENTS=$ARGUMENTS" ${BASH_REMATCH[4]}"
         fi
 
-        # ARGUMENTS="${COMPILER[@]:2}${ARGUMENTS}"
-        # COMPILER="${COMPILER[@]:1:1}"
-
-        # Treat whitespace between option and argument
+        # Deal with whitespace between option and argument
         for w in $COMPILER $ARGUMENTS
         do
             if [[ $w =~ ^-.* ]]
             then
-                ARGS="$ARGS\",\n   \"$w"
+                ARGS="$ARGS\",\n   \"$(escape $w)"
             else
-                ARGS="$ARGS $w"
+                ARGS="$ARGS $(escape $w)"
             fi
         done
 

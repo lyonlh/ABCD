@@ -23,7 +23,7 @@ while read compiler assign value; do \
 $(make -pqRr "$@" 2>/dev/null)
 EOF
 
-# Generate file from which compiler-wrapper.sh can read config
+# Generate file from which CC/CXX-wrapper can read config
 db_file="$(pwd)/compile_commands.json"
 echo "db_file=$(quote $db_file)" >$config
 echo "CC=$(quote $ORIGIN_CC)" >>$config
