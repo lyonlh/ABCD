@@ -1,5 +1,5 @@
-path_name=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
-utils="$path_name/utils"
+my_path=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+utils="$my_path/utils"
 source $utils
 
 generate_compile_command()

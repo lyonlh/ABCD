@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
-path_name=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
-cc_wrapper="$path_name/cc-wrapper.sh"
-cxx_wrapper="$path_name/cxx-wrapper.sh"
-config="$path_name/config"
-utils="$path_name/utils"
+my_path=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+cc_wrapper="$my_path/cc-wrapper.sh"
+cxx_wrapper="$my_path/cxx-wrapper.sh"
+utils="$my_path/utils"
 source $utils
 
 usage="usage: make-wrapper.sh <options of make> [-- [-a] [-d] [-h]]\n \
--a\tuse 'arguments' field in compilation database (default use 'command' field)\n \
+-a\tuse 'arguments' instead of 'command' field in compilation database \n \
 -d\tprint debug message\n \
 -h\tdisplay this help and exit\n \
 "
@@ -53,20 +52,22 @@ do
 $(make -pqRr $make_opts 2>/dev/null)
 EOF
 
-# Generate file from which CC/CXX-wrapper can read config
+# Generate file from which CC/CXX-wrapper can read global enviroment
+global_env="$my_path/global-env"
 db_file="$(pwd)/compile_commands.json"
-echo "db_file=$(quote $db_file)" >$config
-echo "CC=$(quote $ORIGIN_CC)" >>$config
-echo "CXX=$(quote $ORIGIN_CXX)" >>$config
-echo "debug=$(quote $debug)" >>$config
-echo "use_arg_field=$(quote $use_arg_field)" >>$config
+printf "%s\n%s\n%s\n%s\n%s\n" \
+       "db_file=$(quote $db_file)" \
+       "CC=$(quote $ORIGIN_CC)" \
+       "CXX=$(quote $ORIGIN_CXX)" \
+       "debug=$(quote $debug)" \
+       "use_arg_field=$(quote $use_arg_field)" > $global_env
 
 debug_log ====================
-debug_log $(cat $config)
+debug_log $(cat $global_env)
 debug_log ====================
 
-echo "[" > $db_file
-make -j1 -k $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper"
-echo "]" >> $db_file
+printf "[\n" > $db_file
+make -k $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper"
+printf "]\n" >> $db_file
 
-rm -f $config &>/dev/null
+rm -f $global_env &>/dev/null

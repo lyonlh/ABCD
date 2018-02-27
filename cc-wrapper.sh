@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-path_name=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
-source "$path_name/config"
-source "$path_name/compilation-db-factory"
+my_path=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+source "$my_path/global-env"
+source "$my_path/compilation-db-factory"
 
 generate_compile_command $CC "$@" >> $db_file
 
