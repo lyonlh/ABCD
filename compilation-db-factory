@@ -36,8 +36,9 @@ generate_compile_command()
 
         item=" {\n"
         item=$item"  $dir_key: $(quote $DIR),\n"
+        [[ "$use_arg_field" ]] && \
+        item=$item"  $args_key: [\n   $ARGS,\n   $(quote $FILE_NAME),\n  ],\n" || \
         item=$item"  $cmd_key: $(quote $CMD),\n"
-        item=$item"  $args_key: [\n   $ARGS,\n   $(quote $FILE_NAME),\n  ],\n"
         item=$item"  $file_key: $(quote $FILE_NAME),\n },\n"
     fi
 

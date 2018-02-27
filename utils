@@ -12,3 +12,8 @@ quote()
 {
      printf_as_one '"'$(escape $*)'"'
 }
+
+debug_log()
+{
+    [[ $debug ]] && printf "[debug]\t%s\n" "$*"
+}
