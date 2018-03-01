@@ -3,15 +3,19 @@
 my_path=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 cc_wrapper="$my_path/cc-wrapper.sh"
 cxx_wrapper="$my_path/cxx-wrapper.sh"
+cpp_wrapper="$my_path/cpp-wrapper.sh"
 utils="$my_path/utils"
 source $utils
+db_file="$(pwd)/compile_commands.json"
 
-usage="usage: make-wrapper.sh <options of make> [-- [-a] [-d] [-h]]\n \
--a\tuse 'arguments' instead of 'command' field in compilation database \n \
--d\tprint debug message\n \
--h\tdisplay this help and exit\n \
+usage="usage: make-wrapper.sh <options of make> [-- [-a] [-d] [-h] [-o db_file]]\n \
+-a\t\tuse 'arguments' instead of 'command' field in compilation database \n \
+-d\t\tprint debug message\n \
+-h\t\tdisplay this help and exit\n \
+-o db_file\twrite output to the db_file\n \
 "
 
+# Extract options with respective to make and this wrapper
 if [[ $@ =~ (.*)--(.*) ]]
 then
     make_opts=${BASH_REMATCH[1]}
@@ -23,18 +27,25 @@ else
     make_opts=$@
 fi
 
-for o in $wrapper_opts
-do
-    case $o in
-        -a) use_arg_field=1;;
-        -d) debug=1;;
-        -h|*) printf %b "$usage\n"; exit 0;;
-    esac
-done
+# Parse options for this wrapper
+if [[ "${wrapper_opts## }" ]]
+then
+       while getopts abdho: o $wrapper_opts
+       do
+           case $o in
+               a) use_arg_field=1;;
+               d) debug=1;;
+               o) db_file="$(cd $(dirname $OPTARG) && pwd)/$(basename $OPTARG)";;
+               h|*) printf %b "$usage\n"; exit 0;;
+           esac
+       done
+fi
 
 # Retrive CC/CXX from make database
+# The reason to care CPP is someone misuse it as CXX
 ORIGIN_CC="cc"
 ORIGIN_CXX="c++"
+ORIGIN_CPP="cc -E"
 
 while read compiler assign value
 do
@@ -46,6 +57,9 @@ do
         elif [[ "$compiler" == "CXX" ]]
         then
             ORIGIN_CXX=$value;
+        elif [[ "$compiler" == "CPP" ]]
+        then
+            ORIGIN_CPP=$value;
         fi
     fi
     done <<EOF
@@ -54,20 +68,18 @@ EOF
 
 # Generate file from which CC/CXX-wrapper can read global enviroment
 global_env="$my_path/global-env"
-db_file="$(pwd)/compile_commands.json"
 printf "%s\n%s\n%s\n%s\n%s\n" \
        "db_file=$(quote $db_file)" \
        "CC=$(quote $ORIGIN_CC)" \
        "CXX=$(quote $ORIGIN_CXX)" \
+       "CPP=$(quote $ORIGIN_CPP)" \
        "debug=$(quote $debug)" \
        "use_arg_field=$(quote $use_arg_field)" > $global_env
 
-debug_log ====================
 debug_log $(cat $global_env)
-debug_log ====================
 
 printf "[\n" > $db_file
-make -k $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper"
+make -j1 $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper" CPP="$cpp_wrapper"
 printf "]\n" >> $db_file
 
 rm -f $global_env &>/dev/null

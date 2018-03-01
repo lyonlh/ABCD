@@ -1,6 +1,6 @@
 my_path=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
-utils="$my_path/utils"
-source $utils
+source "$my_path/utils"
+source "$my_path/global-env"
 
 generate_compile_command()
 {
@@ -16,7 +16,7 @@ generate_compile_command()
         COMPILER="${BASH_REMATCH[1]}"
         ARGUMENTS="${BASH_REMATCH[2]}"
         FILE_NAME="${BASH_REMATCH[3]}"
-        if [[ ${#BASH_REMATCH[@]} == 4 ]]
+        if [[ ${#BASH_REMATCH[@]} == 5 ]]
         then
             ARGUMENTS=$ARGUMENTS" ${BASH_REMATCH[4]}"
         fi
@@ -39,7 +39,7 @@ generate_compile_command()
         [[ "$use_arg_field" ]] && \
         item=$item"  $args_key: [\n   $ARGS,\n   $(quote $FILE_NAME),\n  ],\n" || \
         item=$item"  $cmd_key: $(quote $CMD),\n"
-        item=$item"  $file_key: $(quote $FILE_NAME),\n },\n"
+        item=$item"  $file_key: $(quote $FILE_NAME)\n },\n"
     fi
 
     [[ -n "$item" ]] && printf %b "$item"

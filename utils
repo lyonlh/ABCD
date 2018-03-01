@@ -15,5 +15,6 @@ quote()
 
 debug_log()
 {
-    [[ $debug ]] && printf "[debug]\t%s\n" "$*"
+    [[ $debug ]] &&
+        printf "[debug]\t%s\n" $*
 }
