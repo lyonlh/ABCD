@@ -15,6 +15,34 @@ quote()
 
 debug_log()
 {
-    [[ $debug ]] &&
-        printf "[debug]\t%s\n" $*
+    [[ "$debug" ]] &&
+        printf "[debug]\t%b\n" "$*"
+    return 0
+}
+
+
+lockfile=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)/lockfile
+
+lock()
+{
+    until ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null
+    do
+        debug_log "Failed to acquire lockfile: $lockfile."
+        debug_log "Held by $(cat $lockfile)"
+        sleep 1
+    done
+
+    trap 'rm -f "$lockfile"' INT TERM EXIT
+
+    debug_log "==$$== Lock acquired."
+}
+
+unlock()
+{
+    debug_log "Lock hold by $(cat $lockfile) and I am $$."
+
+    rm -f "$lockfile"
+    trap - INT TERM EXIT
+
+    debug_log "==$$== Lock released."
 }

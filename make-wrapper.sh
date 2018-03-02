@@ -8,7 +8,7 @@ utils="$my_path/utils"
 source $utils
 db_file="$(pwd)/compile_commands.json"
 
-usage="usage: make-wrapper.sh <options of make> [-- [-a] [-d] [-h] [-o db_file]]\n \
+usage="usage: make-wrapper.sh [make options] [-- [-a] [-d] [-h] [-o db_file]]\n \
 -a\t\tuse 'arguments' instead of 'command' field in compilation database \n \
 -d\t\tprint debug message\n \
 -h\t\tdisplay this help and exit\n \
@@ -30,23 +30,22 @@ fi
 # Parse options for this wrapper
 if [[ "${wrapper_opts## }" ]]
 then
-       while getopts abdho: o $wrapper_opts
-       do
-           case $o in
-               a) use_arg_field=1;;
-               d) debug=1;;
-               o) db_file="$(cd $(dirname $OPTARG) && pwd)/$(basename $OPTARG)";;
-               h|*) printf %b "$usage\n"; exit 0;;
-           esac
-       done
+    while getopts abdho: o $wrapper_opts
+    do
+        case $o in
+            a) use_arg_field=1;;
+            d) debug=1;;
+            o) db_file="$(cd $(dirname $OPTARG) && pwd)/$(basename $OPTARG)";;
+            h|*) printf %b "$usage\n"; exit 0;;
+        esac
+    done
 fi
 
 # Retrive CC/CXX from make database
 # The reason to care CPP is someone misuse it as CXX
 ORIGIN_CC="cc"
 ORIGIN_CXX="c++"
-ORIGIN_CPP="cc -E"
-
+ORIGIN_CPP=""
 while read compiler assign value
 do
     if [[ $assign =~ :?= && "$value" ]]
@@ -74,12 +73,11 @@ printf "%s\n%s\n%s\n%s\n%s\n" \
        "CXX=$(quote $ORIGIN_CXX)" \
        "CPP=$(quote $ORIGIN_CPP)" \
        "debug=$(quote $debug)" \
-       "use_arg_field=$(quote $use_arg_field)" > $global_env
+       "use_arg_field=$(quote $use_arg_field)" > $global_env && \
+    trap 'rm -f $global_env' INT TERM EXIT
 
 debug_log $(cat $global_env)
 
 printf "[\n" > $db_file
-make -j1 $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper" CPP="$cpp_wrapper"
+make $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
 printf "]\n" >> $db_file
-
-rm -f $global_env &>/dev/null

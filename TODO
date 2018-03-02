@@ -1,5 +1,5 @@
 BUGS
-  1. The colon following the last json object.
-  2. The database file is interlaced cause by I/O buffering.
+  1. The colon following the last json object. -- Not resolve but clang can recognized it.
+  2. The database file is interlaced cause by I/O buffering. -- resolved
 
 ENHANCEMENT

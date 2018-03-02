@@ -13,34 +13,44 @@ generate_compile_command()
 
     if [[ $CMD =~ ^([^[:blank:]]+)[[:blank:]]+(.*)[[:blank:]]+([^[:blank:]]+\.(c|cc|cpp|cxx|h|hxx))([[:blank:]].*)?$ ]]
     then
-        COMPILER="${BASH_REMATCH[1]}"
-        ARGUMENTS="${BASH_REMATCH[2]}"
-        FILE_NAME="${BASH_REMATCH[3]}"
-        if [[ ${#BASH_REMATCH[@]} == 5 ]]
+        item=" {\n"
+        item+="  $dir_key: $(quote $DIR),\n"
+
+        if [[ "$use_arg_field" ]] # 'arguments' field
         then
-            ARGUMENTS=$ARGUMENTS" ${BASH_REMATCH[4]}"
+            COMPILER="${BASH_REMATCH[1]}"
+            ARGUMENTS="${BASH_REMATCH[2]}"
+            FILE_NAME="${BASH_REMATCH[3]}"
+            if [[ ${#BASH_REMATCH[@]} == 5 ]]
+            then
+                ARGUMENTS=$ARGUMENTS" ${BASH_REMATCH[4]}"
+            fi
+
+            # Deal with whitespace between option and argument
+            for w in $COMPILER $ARGUMENTS
+            do
+                if [[ $w =~ ^-.* ]]
+                then
+                    ARGS="$ARGS\",\n   \"$(escape $w)"
+                else
+                    ARGS="$ARGS $(escape $w)"
+                fi
+            done
+            # Trim the leading whitspace added last step
+            ARGS=\"${ARGS## }\"
+
+            item+="  $args_key: [\n   $ARGS,\n   $(quote $FILE_NAME)\n  ],\n"
+        else                    # 'command' field
+            item+="  $cmd_key: $(quote $CMD),\n"
         fi
 
-        # Deal with whitespace between option and argument
-        for w in $COMPILER $ARGUMENTS
-        do
-            if [[ $w =~ ^-.* ]]
-            then
-                ARGS="$ARGS\",\n   \"$(escape $w)"
-            else
-                ARGS="$ARGS $(escape $w)"
-            fi
-        done
-
-        ARGS=\"${ARGS## }\"
-
-        item=" {\n"
-        item=$item"  $dir_key: $(quote $DIR),\n"
-        [[ "$use_arg_field" ]] && \
-        item=$item"  $args_key: [\n   $ARGS,\n   $(quote $FILE_NAME)\n  ],\n" || \
-        item=$item"  $cmd_key: $(quote $CMD),\n"
-        item=$item"  $file_key: $(quote $FILE_NAME)\n },\n"
+        # 'filename' feild
+        item+="  $file_key: $(quote $FILE_NAME)\n },\n"
     fi
 
-    [[ -n "$item" ]] && printf %b "$item"
+    # Lock and write unbufferedly (leverage stderr) to achive atomic
+    [[ -n "$item" ]] && \
+        (lock && \
+             printf %b "$item" 2>>$db_file >&2 && \
+             unlock)
 }
