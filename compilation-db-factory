@@ -11,8 +11,10 @@ generate_compile_command()
     local args_key='"arguments"'
     local file_key='"file"'
 
-    if [[ $CMD =~ ^([^[:blank:]]+)[[:blank:]]+(.*)[[:blank:]]+([^[:blank:]]+\.(c|cc|cpp|cxx|h|hxx))([[:blank:]].*)?$ ]]
+    local suffix_regex='(c|cc|cp|cxx|cpp|CPP|c\+\+|C|mm|M|h|hh|H|hp|hxx|hpp|HPP|h\+\+|tcc)'
+    if [[ $CMD =~ ^([^[:blank:]]+)[[:blank:]]+(.*)[[:blank:]]+([^[:blank:]]+\.$suffix_regex)([[:blank:]].*)?$ ]]
     then
+        FILE_NAME="${BASH_REMATCH[3]}"
         item=" {\n"
         item+="  $dir_key: $(quote $DIR),\n"
 
@@ -20,10 +22,9 @@ generate_compile_command()
         then
             COMPILER="${BASH_REMATCH[1]}"
             ARGUMENTS="${BASH_REMATCH[2]}"
-            FILE_NAME="${BASH_REMATCH[3]}"
-            if [[ ${#BASH_REMATCH[@]} == 5 ]]
+            if [[ ${#BASH_REMATCH[@]} == 6 ]]
             then
-                ARGUMENTS=$ARGUMENTS" ${BASH_REMATCH[4]}"
+                ARGUMENTS=$ARGUMENTS" ${BASH_REMATCH[5]}"
             fi
 
             # Deal with whitespace between option and argument

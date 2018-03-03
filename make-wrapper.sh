@@ -74,7 +74,7 @@ printf "%s\n%s\n%s\n%s\n%s\n" \
        "CPP=$(quote $ORIGIN_CPP)" \
        "debug=$(quote $debug)" \
        "use_arg_field=$(quote $use_arg_field)" > $global_env && \
-    trap 'rm -f $global_env' INT TERM EXIT
+    trap "rm -f $global_env" INT TERM EXIT
 
 debug_log $(cat $global_env)
 
