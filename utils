@@ -28,18 +28,18 @@ lock()
     until ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null
     do
         debug_log "==$$== Failed to acquire lockfile: $lockfile."
-        debug_log "Held by $(cat $lockfile)"
+        debug_log "Held by $(< $lockfile)"
         sleep 1
     done
 
     debug_log "==$$== Lock acquired."
 
-    trap "rm -f $lockfile" INT TERM EXIT
+    trap 'rm -f "$lockfile"' INT TERM EXIT
 }
 
 unlock()
 {
-    debug_log "Lock hold by $(cat $lockfile) and I am $$."
+    debug_log "Lock hold by $(< $lockfile) and I am $$."
 
     rm -f "$lockfile"
     trap - INT TERM EXIT
