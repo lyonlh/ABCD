@@ -8,7 +8,7 @@ So that the tools based on the C/C++ Abstract Syntax Tree can parse a translatio
 ## Why ##
 
 It's not easy to generate compilation database under the pure `make` system.  
-Athough there are already some tools<sup>[1](#footnote1)</sup> for this job, making them work well is different.  
+Athough there are already some tools<sup>[1](#footnote1)</sup> for this job, making them work well is difficult.  
 
 ## How it works ##
 **Mint** intercepts the implicit variables `CC` and `CXX` in order to receive the compilation commands from `make` and `shell`.  
@@ -17,10 +17,10 @@ And then **Mint** parses the compilation commands and generates a JSON compilati
 ## Usage ##
 
     mint.sh [make options] [-- [-a] [-d] [-h] [-o db_file]]
-     -a			use 'arguments' instead of 'command' field in compilation database
-     -d			print debug message
-     -h			display this help and exit
-     -o db_file	write output to the db_file
+     -a           use 'arguments' instead of 'command' field in compilation database
+     -d           print debug message
+     -h           display this help and exit
+     -o db_file   write output to the db_file
 
 ## Testing ##
 Already tested under Macosx Sierra 10.12.6 and Ubuntu 16.04.
