@@ -24,7 +24,7 @@ And then **Mint** parses the compilation commands and generates a JSON compilati
 
 Enter the directory you run `make` generally, invoke `mint.sh` instead. For example,  
 
-    mint.sh -Bkj all -- -o compile_commands.json
+    /path/to/mint.sh -Bkj all -- -o compile_commands.json
 
 ## Testing ##
 Already tested under Macosx Sierra 10.12.6 and Ubuntu 16.04.
