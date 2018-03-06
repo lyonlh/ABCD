@@ -8,7 +8,7 @@ utils="$my_path/utils"
 source $utils
 db_file="$(pwd)/compile_commands.json"
 
-usage="usage: make-wrapper.sh [make options] [-- [-a] [-d] [-h] [-o db_file]]\n \
+usage="usage: mint.sh [make options] [-- [-a] [-d] [-h] [-o db_file]]\n \
 -a\t\tuse 'arguments' instead of 'command' field in compilation database \n \
 -d\t\tprint debug message\n \
 -h\t\tdisplay this help and exit\n \
