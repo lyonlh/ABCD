@@ -80,4 +80,5 @@ debug_log $(cat $global_env)
 
 printf "[\n" > $db_file
 make $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
-printf "]\n" >> $db_file
+mv ${db_file}{,_tmp} && head -c -2 ${db_file}_tmp > $db_file && rm -f ${db_file}_tmp
+printf "\n]\n" >> $db_file
