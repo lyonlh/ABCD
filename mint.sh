@@ -80,4 +80,6 @@ debug_log $(cat $global_env)
 
 printf "[\n" > $db_file
 make $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
-printf "]\n" >> $db_file
+# Delete tail comma
+sed -i -n -e '$!p' $db_file
+printf " }\n]\n" >> $db_file
