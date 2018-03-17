@@ -28,7 +28,7 @@ generate_compile_command()
             fi
 
             # Deal with whitespace between option and argument
-            for w in "$COMPILER" "$ARGUMENTS"
+            for w in $COMPILER $ARGUMENTS
             do
                 if [[ $w =~ ^-.* ]]
                 then
