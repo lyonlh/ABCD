@@ -1,4 +1,4 @@
-my_path=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+my_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$my_path/utils"
 source "$my_path/global-env"
 
