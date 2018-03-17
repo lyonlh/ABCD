@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-my_path=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+my_path="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cc_wrapper="$my_path/cc-wrapper.sh"
 cxx_wrapper="$my_path/cxx-wrapper.sh"
 cpp_wrapper="$my_path/cpp-wrapper.sh"
@@ -61,24 +61,24 @@ do
         fi
     fi
     done <<EOF
-$(make -pqRr $make_opts 2>/dev/null)
+$(make -pqRr "${make_opts[@]}" 2>/dev/null)
 EOF
 
 # Generate file from which CC/CXX-wrapper can read global enviroment
 global_env="$my_path/global-env"
 printf "%s\\n%s\\n%s\\n%s\\n%s\\n" \
-       "db_file=$(quote $db_file)" \
-       "CC=$(quote $ORIGIN_CC)" \
-       "CXX=$(quote $ORIGIN_CXX)" \
-       "CPP=$(quote $ORIGIN_CPP)" \
-       "debug=$(quote $debug)" \
+       "db_file=$(quote "$db_file")" \
+       "CC=$(quote "$ORIGIN_CC")" \
+       "CXX=$(quote "$ORIGIN_CXX")" \
+       "CPP=$(quote "$ORIGIN_CPP")" \
+       "debug=$(quote "$debug")" \
        "use_arg_field=$(quote $use_arg_field)" > "$global_env" && \
-    trap 'rm -f "$global_env"' INT TERM EXIT
+    trap "rm -f '$global_env'" INT TERM EXIT
 
-debug_log $(< "$global_env")
+debug_log "$(< "$global_env")"
 
 printf "[\\n" > "$db_file"
-make $make_opts CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
+make "${make_opts[@]}" CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
 # Delete tail comma
 sed -i -n -e '$!p' "$db_file"
 printf " }\\n]\\n" >> "$db_file"
