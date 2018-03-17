@@ -15,26 +15,28 @@ usage="usage: mint.sh [make options] [-- [-a] [-d] [-h] [-o db_file]]\\n \
 "
 
 # Extract options with respective to make and this wrapper
-if [[ $* =~ (.*)--(.*) ]]
-then
-    make_opts=${BASH_REMATCH[1]}
-    if [[ ${#BASH_REMATCH[@]} == 3 ]]
+declare -a make_opts wrapper_opts
+declare -i i
+for (( i=1; i<${#@}; i++))
+do
+    if [[ "${!i}" == "--" ]]
     then
-        wrapper_opts=${BASH_REMATCH[2]}
+        break
     fi
-else
-    make_opts=$*
-fi
+done
+
+make_opts=( "${@:1:(($i-1))}" )
+wrapper_opts=( "${@:(($i+1))}" )
 
 # Parse options for this wrapper
 if [[ "${wrapper_opts## }" ]]
 then
-    while getopts abdho: o $wrapper_opts
+    while getopts abdho: o "${wrapper_opts[@]}"
     do
         case $o in
             a) use_arg_field=1;;
             d) debug=1;;
-            o) db_file="$(cd $(dirname $OPTARG) && pwd)/$(basename $OPTARG)";;
+            o) db_file="$(cd -P "$(dirname "$OPTARG")" && pwd)/$(basename "$OPTARG")";;
             h|*) printf %b "$usage\\n"; exit 0;;
         esac
     done
@@ -76,6 +78,7 @@ printf "%s\\n%s\\n%s\\n%s\\n%s\\n" \
     trap "rm -f '$global_env'" INT TERM EXIT
 
 debug_log "$(< "$global_env")"
+debug_log "$(declare -p make_opts wrapper_opts)"
 
 printf "[\\n" > "$db_file"
 make "${make_opts[@]}" CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
