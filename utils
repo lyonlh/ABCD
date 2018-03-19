@@ -5,7 +5,7 @@ printf_as_one()
 
 escape()
 {
-     printf_as_one "${*//'\"'/'\\\"'}"
+     printf_as_one "${*//'"'/'\"'}"
 }
 
 quote()
