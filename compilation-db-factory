@@ -11,7 +11,7 @@ generate_compile_command()
     local args_key='"arguments"'
     local file_key='"file"'
 
-    local suffix_regex='(c|cc|cp|cxx|cpp|CPP|c\+\+|C|mm|M|h|hh|H|hp|hxx|hpp|HPP|h\+\+|tcc)'
+    local suffix_regex='(c|i|ii|m|mi|mm|M|mii|cc|cp|cxx|cpp|CPP|c\+\+|C|h|hh|H|hp|hxx|hpp|HPP|h\+\+|tcc)'
     if [[ $CMD =~ ^([^[:blank:]]+)[[:blank:]]+(.*)[[:blank:]]+([^[:blank:]]+\.$suffix_regex)([[:blank:]].*)?$ ]]
     then
         FILE_NAME="${BASH_REMATCH[3]}"
