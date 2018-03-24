@@ -1,3 +1,5 @@
+_NEWLINE_=$'\n'
+
 printf_as_one()
 {
     printf "%s" "$*"
@@ -16,7 +18,7 @@ quote()
 debug_log()
 {
     [[ "$debug" ]] &&
-        printf "[debug]\\t%b\\n" "$*"
+        (IFS=$_NEWLINE_; printf "[ debug ]\\t%b$_NEWLINE_" $@)
     return 0
 }
 
@@ -32,7 +34,7 @@ lock()
 
     debug_log "==$$== Lock acquired."
 
-    trap "rm -f '$lockfile'" INT TERM EXIT
+    trap "rm -f '$lockfile'; exit $?" INT TERM EXIT
 }
 
 unlock()

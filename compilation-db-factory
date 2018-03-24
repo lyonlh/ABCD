@@ -15,8 +15,8 @@ generate_compile_command()
     if [[ $CMD =~ ^([^[:blank:]]+)[[:blank:]]+(.*)[[:blank:]]+([^[:blank:]]+\.$suffix_regex)([[:blank:]].*)?$ ]]
     then
         FILE_NAME="${BASH_REMATCH[3]}"
-        item=" {\n"
-        item+="  $dir_key: $(quote $DIR),\n"
+        item=" {$_NEWLINE_"
+        item+="  $dir_key: $(quote $DIR),$_NEWLINE_"
 
         if [[ "$use_arg_field" ]] # 'arguments' field
         then
@@ -32,7 +32,7 @@ generate_compile_command()
             do
                 if [[ $w =~ ^-.* ]]
                 then
-                    ARGS="$ARGS\",\n   \"$(escape $w)"
+                    ARGS="$ARGS\",$_NEWLINE_   \"$(escape $w)"
                 else
                     ARGS="$ARGS $(escape $w)"
                 fi
@@ -40,13 +40,13 @@ generate_compile_command()
             # Trim the leading whitspace added last step
             ARGS=\"${ARGS## }\"
 
-            item+="  $args_key: [\n   $ARGS,\n   $(quote $FILE_NAME)\n  ],\n"
+            item+="  $args_key: [$_NEWLINE_   $ARGS,$_NEWLINE_   $(quote $FILE_NAME)$_NEWLINE_  ],$_NEWLINE_"
         else                    # 'command' field
-            item+="  $cmd_key: $(quote $CMD),\n"
+            item+="  $cmd_key: $(quote $CMD),$_NEWLINE_"
         fi
 
         # 'filename' feild
-        item+="  $file_key: $(quote $FILE_NAME)\n },\n"
+        item+="  $file_key: $(quote $FILE_NAME)$_NEWLINE_ },$_NEWLINE_"
     fi
 
     # Lock and write unbufferedly (leverage stderr) to achive atomic
@@ -54,4 +54,8 @@ generate_compile_command()
         (lock && \
              printf %b "$item" 2>>$db_file >&2 && \
              unlock)
+
+    debug_log "Current DIR: $DIR"
+    debug_log "Command: $CMD"
+    debug_log "Result:$_NEWLINE_$item"
 }
