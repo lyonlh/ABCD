@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 
 my_path="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_make="make"
 cc_wrapper="$my_path/cc-wrapper.sh"
 cxx_wrapper="$my_path/cxx-wrapper.sh"
 cpp_wrapper="$my_path/cpp-wrapper.sh"
 source "$my_path/utils"
 db_file="$(pwd)/compile_commands.json"
 
-usage="usage: mint.sh [make options] [-- [-a] [-d] [-h] [-o db_file]]$_NEWLINE_ \
+usage="usage: mint.sh [make options] [-- [-a] [-d] [-h] [-m specified_make] [-o db_file]]$_NEWLINE_ \
 -a\\t\\tuse 'arguments' instead of 'command' field in compilation database $_NEWLINE_ \
 -d\\t\\tprint debug message$_NEWLINE_ \
 -h\\t\\tdisplay this help and exit$_NEWLINE_ \
+-m\\t\\tspecify path or name of 'make'$_NEWLINE_ \
 -o db_file\\twrite output to the db_file$_NEWLINE_ \
 "
 
@@ -31,11 +33,12 @@ wrapper_opts=( "${@:(($i+1))}" )
 # Parse options for this wrapper
 if [[ "${wrapper_opts## }" ]]
 then
-    while getopts abdho: o "${wrapper_opts[@]}"
+    while getopts abdhm:o: o "${wrapper_opts[@]}"
     do
         case $o in
             a) use_arg_field=1;;
             d) debug=1;;
+            m) _make=$OPTARG;;
             o) db_file="$(cd -P "$(dirname "$OPTARG")" && pwd)/$(basename "$OPTARG")";;
             h|*) printf %b "$usage$_NEWLINE_"; exit 0;;
         esac
@@ -63,7 +66,7 @@ do
         fi
     fi
     done <<EOF
-$(make -pqRr "${make_opts[@]}" 2>/dev/null)
+$("$_make" -pqRr "${make_opts[@]}" 2>/dev/null)
 EOF
 
 # Generate file from which CC/CXX-wrapper can read global enviroment
@@ -83,7 +86,7 @@ debug_log "##Internal ENV##$_NEWLINE_$(< "$global_env")"
 debug_log "##Command line options##$_NEWLINE_$(declare -p make_opts wrapper_opts)"
 
 printf "[$_NEWLINE_" > "$db_file"
-make "${make_opts[@]}" CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
+"$_make" "${make_opts[@]}" CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
 # Delete tail comma
 sed -i -e '${/^ *\},$/d}' "$db_file"
 printf " }$_NEWLINE_]$_NEWLINE_" >> "$db_file"

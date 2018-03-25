@@ -20,6 +20,7 @@ And then **Mint** parses the compilation commands and generates a JSON compilati
      -a           use 'arguments' instead of 'command' field in compilation database
      -d           print debug message
      -h           display this help and exit
+     -m           tspecify path or name of 'make'
      -o db_file   write output to the db_file
 
 Enter the directory you run `make` generally, invoke `mint.sh` instead. For example,  
