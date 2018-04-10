@@ -88,7 +88,7 @@ debug_log "##Command line options##$_NEWLINE_$(declare -p make_opts wrapper_opts
 printf "[$_NEWLINE_" > "$db_file"
 "$_make" "${make_opts[@]}" CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
 # Delete tail comma
-sed -i -e '${/^ *\},$/d}' "$db_file"
-printf " }$_NEWLINE_]$_NEWLINE_" >> "$db_file"
+sed -i -e '${s/\(^ *\}\),$/\1/}' "$db_file"
+printf "]$_NEWLINE_" >> "$db_file"
 
 printf "$_NEWLINE_#### Done ####$_NEWLINE_"
