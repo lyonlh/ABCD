@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 my_path="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-_make="make"
+_make=("make")
 cc_wrapper="$my_path/cc-wrapper.sh"
 cxx_wrapper="$my_path/cxx-wrapper.sh"
 cpp_wrapper="$my_path/cpp-wrapper.sh"
@@ -19,7 +19,7 @@ usage="usage: mint.sh [make options] [-- [-a] [-d] [-h] [-m specified_make] [-o 
 # Extract options with respective to make and this wrapper
 declare -a make_opts wrapper_opts
 declare -i i
-for (( i=1; i<${#@}; i++))
+for (( i=1; i<${#@}; i++ ))
 do
     if [[ "${!i}" == "--" ]]
     then
@@ -27,8 +27,8 @@ do
     fi
 done
 
-make_opts=( "${@:1:(($i-1))}" )
-wrapper_opts=( "${@:(($i+1))}" )
+make_opts=("${@:1:(($i-1))}")
+wrapper_opts=("${@:(($i+1))}")
 
 # Parse options for this wrapper
 if [[ "${wrapper_opts## }" ]]
@@ -38,7 +38,7 @@ then
         case $o in
             a) use_arg_field=1;;
             d) debug=1;;
-            m) _make=$OPTARG;;
+            m) _make=($OPTARG);;
             o) db_file="$(cd -P "$(dirname "$OPTARG")" && pwd)/$(basename "$OPTARG")";;
             h|*) printf %b "$usage$_NEWLINE_"; exit 0;;
         esac
@@ -66,7 +66,7 @@ do
         fi
     fi
     done <<EOF
-$("$_make" -pqRr "${make_opts[@]}" 2>/dev/null)
+$("${_make[@]}" -pqRr "${make_opts[@]}" 2>/dev/null)
 EOF
 
 # Generate file from which CC/CXX-wrapper can read global enviroment
@@ -86,7 +86,7 @@ debug_log "##Internal ENV##$_NEWLINE_$(< "$global_env")"
 debug_log "##Command line options##$_NEWLINE_$(declare -p make_opts wrapper_opts)"
 
 printf "[$_NEWLINE_" > "$db_file"
-"$_make" "${make_opts[@]}" CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
+"${_make[@]}" "${make_opts[@]}" CC="$cc_wrapper" CXX="$cxx_wrapper" ${ORIGIN_CPP:+CPP="$cpp_wrapper"}
 # Delete tail comma
 sed -i -e '${s/\(^ *\}\),$/\1/}' "$db_file"
 printf "]$_NEWLINE_" >> "$db_file"
