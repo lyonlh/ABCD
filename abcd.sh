@@ -8,7 +8,7 @@ cpp_wrapper="$my_path/cpp-wrapper.sh"
 source "$my_path/utils"
 db_file="$(pwd)/compile_commands.json"
 
-usage="usage: mint.sh [make options] [-- [-a] [-d] [-h] [-m specified_make] [-o db_file]]$_NEWLINE_ \
+usage="usage: abcd.sh [make options] [-- [-a] [-d] [-h] [-m specified_make] [-o db_file]]$_NEWLINE_ \
 -a\\t\\tuse 'arguments' instead of 'command' field in compilation database $_NEWLINE_ \
 -d\\t\\tprint debug message$_NEWLINE_ \
 -h\\t\\tdisplay this help and exit$_NEWLINE_ \
