@@ -34,7 +34,7 @@ Already tested under Macosx Sierra 10.12.6 and Ubuntu 16.04.
 If you find a bug, please report it to the issue tracker. Please give the detailed description such as OS, projects and so on.
 
 ## Contribution ##
-Any suggestion and pull request is welcomed :)
+Any suggestion and pull request is welcome :)
 
 ## License ##
 MIT.
